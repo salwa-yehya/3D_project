@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import './style.css'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-// import gsap from './gsap';
+import gsap from 'gsap';
 
 //scene
 const scene = new THREE.Scene();
@@ -10,6 +10,7 @@ const scene = new THREE.Scene();
 const geometry = new THREE.SphereGeometry( 3, 64, 64 ); //(radius , widthsegment , hightsegment)
 const material = new THREE.MeshStandardMaterial( { 
     color: '#00ff83' ,
+    roughness :0.7 ,
 
 } );
 const mesh = new THREE.Mesh( geometry, material );
@@ -25,6 +26,7 @@ const size ={
 //light 
 const light = new THREE.PointLight( 0xffffff, 1, 100 );
 light.position.set( 0, 10, 10 ); //(x , y ,z )postion
+light.intensity =1.25   //defult=1
 scene.add( light );
 
 
@@ -75,22 +77,27 @@ loop()
 
 //Timeline    
  //->//gsap dont work
-// const TI = gsap.Timeline({defaults :{duration :1} })
-// TI.fromTo(mesh.scale , {z:0 , x:0 , y:0} , {z:1 , x:1 , y:1})
-// TI.fromTo("nav" , {y :-100%} , {y :0%})
-// TI.fromTo(".title", {opacity :0 } , {opacity:1})
+const TI = gsap.timeline({defaults :{duration :1} })
+TI.fromTo(mesh.scale , {z:0 , x:0 , y:0} , {z:1 , x:1 , y:1})
+TI.fromTo("nav" , {y :"-100%" } , {y :"0%" })
+TI.fromTo(".title", {opacity :0 } , {opacity:1})
 
 
 //mouse animation
-let mouseDown =false 
+let mouseDown = false;
 let rgb = [];
-window.addEventListener('mouseDown' , () => (mouseDown =true) )
-window.addEventListener('mouseup' , () => (mouseDown =false) )
-window.addEventListener('mousemove' , (e) => {
-    if(mouseDown){
-        rgb = [
-            Math.round((e.pageX / size.width ) * 255)] // كانو بمشي ع خط الالوان بالماوس , ببلش الرينج من 0 ل 255
-            console.log(rgb)
-        
-    }
-})
+window.addEventListener("mousedown" , () => (mouseDown = true));
+window.addEventListener("mouseup" , () => (mouseDown = false));
+window.addEventListener("mousemove" , (e) => {
+    rgb = [
+      Math.round((e.pageX / size.width) * 255),
+      Math.round((e.pageY / size.height) * 255),
+      150, // or any value you want for the blue channel
+    ];
+    console.log(rgb);
+    //animate
+    let newColor = new THREE.Color(`rgb(${rgb.join(",")})`)
+    // new THREE.Color(`rgb(0,100,150)`)
+    gsap.to(mesh.material.color , { r:newColor.r , g:newColor.g , b:newColor.b })
+     
+});
